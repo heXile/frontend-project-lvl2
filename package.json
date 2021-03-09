@@ -17,6 +17,9 @@
     "url": "https://github.com/heXile/frontend-project-lvl2/issues"
   },
   "homepage": "https://github.com/heXile/frontend-project-lvl2#readme",
+  "bin": {
+    "gendiff": "bin/gendiff.js"
+  },
   "dependencies": {
     "commander": "^7.1.0"
   },
