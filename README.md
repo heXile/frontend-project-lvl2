@@ -9,4 +9,4 @@
 
 ### Description:
 
-[1st demo](https://asciinema.org/a/D02zey5OJGlGl9vJZq6USgx1o)
+[![1-st Demo](https://asciinema.org/a/D02zey5OJGlGl9vJZq6USgx1o.svg)](https://asciinema.org/a/D02zey5OJGlGl9vJZq6USgx1o)
