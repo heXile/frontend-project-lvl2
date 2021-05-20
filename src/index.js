@@ -1,5 +1,5 @@
-import { readFileContent } from './utils.js';
 import _ from 'lodash';
+import { readFileContent } from './utils.js';
 
 const genDiff = (filePath1, filePath2) => {
   const fileContent1 = readFileContent(filePath1);
