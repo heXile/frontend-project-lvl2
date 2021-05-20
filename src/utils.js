@@ -1,8 +1,8 @@
 import { readFileSync } from 'fs';
 
-export const readFileContent = (filePath) => {
-  return readFileSync(filePath, {
-    encoding: 'utf-8',
-    flag: 'r',
-  });
+export const readFileContent = (filePath, defaultParams = {
+  encoding: 'utf-8',
+  flag: 'r',
+}) => {
+  return readFileSync(filePath, defaultParams);
 };
