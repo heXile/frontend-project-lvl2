@@ -1,21 +1,31 @@
+import { fileURLToPath } from 'url';
+import path from 'path';
+
 import genDiff from '../src/index.js';
 import { readFileContent } from '../src/utils.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const getFixturePath = (filename) =>
+  path.join(__dirname, '..', '__fixtures__', filename);
+
 test('gendiff main functionality', () => {
-  expect(genDiff('__fixtures__/file1.json', '__fixtures__/file2.json')).toEqual(
-    readFileContent('__fixtures__/result1to2')
-  );
-  expect(genDiff('__fixtures__/file2.json', '__fixtures__/file1.json')).toEqual(
-    readFileContent('__fixtures__/result2to1')
-  );
+  expect(
+    genDiff(getFixturePath('file1.json'), getFixturePath('file2.json'))
+  ).toEqual(readFileContent(getFixturePath('result1to2')));
+  expect(
+    genDiff(getFixturePath('file2.json'), getFixturePath('file1.json'))
+  ).toEqual(readFileContent(getFixturePath('result2to1')));
 });
 
 test('Comparing correct to an empty json file', () => {
-  expect(genDiff('__fixtures__/file2.json', '__fixtures__/empty.json')).toEqual(
-    readFileContent('__fixtures__/result2toE')
-  );
+  expect(
+    genDiff(getFixturePath('file2.json'), getFixturePath('empty.json'))
+  ).toEqual(readFileContent(getFixturePath('result2toE')));
 });
 
 test('Comparing 2 empty json files', () => {
-  expect(genDiff('__fixtures__/empty.json', '__fixtures__/empty.json')).toEqual('{\n}');
+  expect(
+    genDiff(getFixturePath('empty.json'), getFixturePath('empty.json'))
+  ).toEqual('{\n}');
 });
