@@ -1,3 +1,4 @@
+/* eslint-disable import/prefer-default-export */
 import { readFileSync } from 'fs';
 
 export const readFileContent = (
@@ -7,5 +8,3 @@ export const readFileContent = (
     flag: 'r',
   }
 ) => readFileSync(filePath, defaultParams);
-
-export default readFileContent;

@@ -26,8 +26,6 @@ const genDiff = (filePath1, filePath2) => {
     }
   });
   result.push('}');
-  // console.log(result.join('\n'));
-  // console.log(`${filePath1} ${filePath2} ${program.opts().format}`);
   return result.join('\n');
 };
 
