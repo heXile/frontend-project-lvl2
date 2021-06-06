@@ -3,11 +3,18 @@ import * as path from 'path';
 import { readFileContent } from './utils.js';
 import { parseJSON, parseYAML } from './parsers.js';
 
+const formats = {
+  '.json': 'JSON',
+  '.yml': 'YAML',
+  '.yaml': 'YAML',
+};
+
 const genDiff = (filePath1, filePath2) => {
   const [ext1, ext2] = [path.extname(filePath1), path.extname(filePath2)];
-  if (ext1 !== ext2) {
-    throw new Error('File extensions must be the same');
+  if (formats[ext1] !== formats[ext2]) {
+    throw new Error('File formats must be the same');
   }
+
   const [fileContent1, fileContent2] = [
     readFileContent(filePath1),
     readFileContent(filePath2),
