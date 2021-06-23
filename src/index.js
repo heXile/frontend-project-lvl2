@@ -3,15 +3,61 @@ import * as path from 'path';
 import { readFileContent } from './utils.js';
 import { parseJSON, parseYAML } from './parsers.js';
 
-const formats = {
+const fileFormats = {
   '.json': 'JSON',
   '.yml': 'YAML',
   '.yaml': 'YAML',
 };
 
+const parsers = {
+  JSON: parseJSON,
+  YAML: parseYAML,
+};
+
+const buildDiffObject = (obj1, obj2) => {
+  const diffObject = {};
+  const [keys1, keys2] = [_.keys(obj1), _.keys(obj2)];
+  const allKeys = _.sortBy(_.union(keys1, keys2));
+  allKeys.forEach((key) => {
+    let state;
+    let value;
+    let diffValue;
+    if (_.isPlainObject(obj1[key]) && _.isPlainObject(obj2[key])) {
+      state = null;
+      value = buildDiffObject(obj1[key], obj2[key]);
+    } else if (keys1.includes(key)) {
+      if (keys2.includes(key)) {
+        if (obj1[key] === obj2[key]) {
+          // unchanged
+          [state, value] = ['unchanged', obj1[key]];
+        } else {
+          // changed
+          [state, value, diffValue] = ['changed', obj1[key], obj2[key]];
+        }
+      } else {
+        // deleted
+        [state, diffValue] = ['deleted', obj1[key]];
+      }
+    } else {
+      // added
+      [state, diffValue] = ['added', obj2[key]];
+    }
+    diffObject[key] = { state, value, diffValue };
+    // console.log(`diffObject.${key} = ${diffObject[key]}`);
+  });
+  return diffObject;
+};
+
+const formatDiff = (diffObject, diffFormat = 'stylish') => {
+  const keys = _.keys(diffObject);
+  const diff = keys.map((key) => {
+    const line = `${key}: ${diffObject[key]}`;
+  });
+};
+
 const genDiff = (filePath1, filePath2) => {
   const [ext1, ext2] = [path.extname(filePath1), path.extname(filePath2)];
-  if (formats[ext1] !== formats[ext2]) {
+  if (fileFormats[ext1] !== fileFormats[ext2]) {
     throw new Error('File formats must be the same');
   }
 
@@ -20,44 +66,17 @@ const genDiff = (filePath1, filePath2) => {
     readFileContent(filePath2),
   ];
 
-  let parseContent;
-  switch (ext1) {
-    case '.json':
-      parseContent = parseJSON;
-      break;
-    case '.yml':
-    case '.yaml':
-      parseContent = parseYAML;
-      break;
-    default:
-      throw new Error(`No handler for the extension ${ext1}`);
-  }
+  const parseStr = parsers[fileFormats[ext1]];
 
   const [obj1, obj2] = [
-    parseContent(fileContent1) || {},
-    parseContent(fileContent2) || {},
+    parseStr(fileContent1) || {},
+    parseStr(fileContent2) || {},
   ];
-  const [keys1, keys2] = [Object.keys(obj1), Object.keys(obj2)];
-  const keysAll = _.sortBy(_.union(keys1, keys2));
 
-  const result = ['{'];
-  keysAll.forEach((key) => {
-    if (keys1.includes(key)) {
-      if (keys2.includes(key)) {
-        if (obj1[key] === obj2[key]) result.push(`    ${key}: ${obj1[key]}`);
-        else {
-          result.push(`  - ${key}: ${obj1[key]}`);
-          result.push(`  + ${key}: ${obj2[key]}`);
-        }
-      } else {
-        result.push(`  - ${key}: ${obj1[key]}`);
-      }
-    } else {
-      result.push(`  + ${key}: ${obj2[key]}`);
-    }
-  });
-  result.push('}');
-  return result.join('\n');
+  const diffObject = buildDiffObject(obj1, obj2);
+  console.log(diffObject);
+  const diff = formatDiff(diffObject);
+  return diff;
 };
 
 export default genDiff;

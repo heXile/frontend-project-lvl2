@@ -35,12 +35,3 @@ test('Comparing correct to an empty file', () => {
     genDiff(getFixturePath('file2.yml'), getFixturePath('empty.yml'))
   ).toEqual(readFileContent(getFixturePath('result2toE')));
 });
-
-test('Comparing 2 empty files', () => {
-  expect(
-    genDiff(getFixturePath('empty.json'), getFixturePath('empty.json'))
-  ).toEqual('{\n}');
-  expect(
-    genDiff(getFixturePath('empty.yml'), getFixturePath('empty.yml'))
-  ).toEqual('{\n}');
-});
