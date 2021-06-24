@@ -13,25 +13,10 @@ test('gendiff main json functionality', () => {
   expect(
     genDiff(getFixturePath('file1.json'), getFixturePath('file2.json'))
   ).toEqual(readFileContent(getFixturePath('result1to2')));
-  expect(
-    genDiff(getFixturePath('file2.json'), getFixturePath('file1.json'))
-  ).toEqual(readFileContent(getFixturePath('result2to1')));
 });
 
 test('gendiff main yaml functionality', () => {
   expect(
     genDiff(getFixturePath('file1.yml'), getFixturePath('file2.yml'))
   ).toEqual(readFileContent(getFixturePath('result1to2')));
-  expect(
-    genDiff(getFixturePath('file2.yml'), getFixturePath('file1.yml'))
-  ).toEqual(readFileContent(getFixturePath('result2to1')));
-});
-
-test('Comparing correct to an empty file', () => {
-  expect(
-    genDiff(getFixturePath('file2.json'), getFixturePath('empty.json'))
-  ).toEqual(readFileContent(getFixturePath('result2toE')));
-  expect(
-    genDiff(getFixturePath('file2.yml'), getFixturePath('empty.yml'))
-  ).toEqual(readFileContent(getFixturePath('result2toE')));
 });
