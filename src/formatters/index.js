@@ -3,7 +3,7 @@ import formatPlain from './plain.js';
 
 const formatters = {
   stylish: formatStylish,
-  another: formatPlain,
+  plain: formatPlain,
 };
 
 const chooseFormatter = (format) => formatters[format];

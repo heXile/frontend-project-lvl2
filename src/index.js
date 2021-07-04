@@ -24,22 +24,17 @@ const buildDiffObject = (obj1, obj2) => {
     } else if (keys1.includes(key)) {
       if (keys2.includes(key)) {
         if (obj1[key] === obj2[key]) {
-          // unchanged
           [state, value] = ['unchanged', obj1[key]];
         } else {
-          // changed
           [state, value, diffValue] = ['changed', obj1[key], obj2[key]];
         }
       } else {
-        // deleted
         [state, diffValue] = ['deleted', obj1[key]];
       }
     } else {
-      // added
       [state, diffValue] = ['added', obj2[key]];
     }
     diffObject[key] = { state, value, diffValue };
-    // console.log(`diffObject.${key} = ${diffObject[key]}`);
   });
   return diffObject;
 };
