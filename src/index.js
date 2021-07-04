@@ -1,23 +1,13 @@
 import _ from 'lodash';
 import * as path from 'path';
 import { readFileContent } from './utils.js';
-import { parseJSON, parseYAML } from './parsers.js';
-import { formatStylish, formatAnother } from './formatters.js';
+import chooseParser from './parsers.js';
+import chooseFormatter from './formatters/index.js';
 
 const fileFormats = {
   '.json': 'JSON',
   '.yml': 'YAML',
   '.yaml': 'YAML',
-};
-
-const parsers = {
-  JSON: parseJSON,
-  YAML: parseYAML,
-};
-
-const formatters = {
-  stylish: formatStylish,
-  another: formatAnother,
 };
 
 const buildDiffObject = (obj1, obj2) => {
@@ -54,11 +44,6 @@ const buildDiffObject = (obj1, obj2) => {
   return diffObject;
 };
 
-const formatDiff = (diffObject, diffFormat) => {
-  const format = formatters[diffFormat];
-  return format(diffObject);
-};
-
 const genDiff = (filePath1, filePath2, outputFormat = 'stylish') => {
   const [ext1, ext2] = [path.extname(filePath1), path.extname(filePath2)];
   if (fileFormats[ext1] !== fileFormats[ext2]) {
@@ -70,7 +55,7 @@ const genDiff = (filePath1, filePath2, outputFormat = 'stylish') => {
     readFileContent(filePath2),
   ];
 
-  const parseStr = parsers[fileFormats[ext1]];
+  const parseStr = chooseParser(fileFormats[ext1]);
 
   const [obj1, obj2] = [
     parseStr(fileContent1) || {},
@@ -78,7 +63,8 @@ const genDiff = (filePath1, filePath2, outputFormat = 'stylish') => {
   ];
 
   const diffObject = buildDiffObject(obj1, obj2);
-  const diff = formatDiff(diffObject, outputFormat);
+  const formatDiff = chooseFormatter(outputFormat);
+  const diff = formatDiff(diffObject);
   return diff;
 };
 

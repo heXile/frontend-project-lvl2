@@ -1,8 +1,10 @@
 import _ from 'lodash';
 
+const getIndent = (depth) => '    '.repeat(depth);
+
 const formatPlainObject = (obj, depth) => {
   const result = [];
-  const indent = '    '.repeat(depth + 1);
+  const indent = getIndent(depth + 1);
   const keys = _.sortBy(_.keys(obj));
   keys.forEach((key) => {
     if (!_.isPlainObject(obj[key])) {
@@ -16,11 +18,11 @@ const formatPlainObject = (obj, depth) => {
   return result;
 };
 
-export const formatStylish = (diffObject) => {
+const formatStylish = (diffObject) => {
   const iter = (innerDiffObject, depth) => {
     const result = [];
     const keys = _.sortBy(_.keys(innerDiffObject));
-    const indent = '    '.repeat(depth);
+    const indent = getIndent(depth);
     keys.forEach((key) => {
       const { state, value, diffValue } = innerDiffObject[key];
       switch (state) {
@@ -76,8 +78,4 @@ export const formatStylish = (diffObject) => {
   return ['{', ...iter(diffObject, 0), '}'].join('\n');
 };
 
-// eslint-disable-next-line no-unused-vars
-export const formatAnother = (diffObject) => {
-  // eslint-disable-next-line spaced-comment
-  //FIXME
-};
+export default formatStylish;

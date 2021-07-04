@@ -11,12 +11,22 @@ const getFixturePath = (filename) =>
 
 test('gendiff main json functionality', () => {
   expect(
-    genDiff(getFixturePath('file1.json'), getFixturePath('file2.json'))
+    genDiff(
+      getFixturePath('file1.json'),
+      getFixturePath('file2.json'),
+      'stylish'
+    )
   ).toEqual(readFileContent(getFixturePath('result1to2')));
+  expect(
+    genDiff(getFixturePath('file1.json'), getFixturePath('file2.json'), 'plain')
+  ).toEqual(readFileContent(getFixturePath('result1to2.plain')));
 });
 
 test('gendiff main yaml functionality', () => {
   expect(
-    genDiff(getFixturePath('file1.yml'), getFixturePath('file2.yml'))
+    genDiff(getFixturePath('file1.yml'), getFixturePath('file2.yml'), 'stylish')
   ).toEqual(readFileContent(getFixturePath('result1to2')));
+  expect(
+    genDiff(getFixturePath('file1.yml'), getFixturePath('file2.yml'), 'plain')
+  ).toEqual(readFileContent(getFixturePath('result1to2.plain')));
 });
