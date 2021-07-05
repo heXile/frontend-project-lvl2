@@ -16,25 +16,25 @@ const buildDiffObject = (obj1, obj2) => {
   const allKeys = _.sortBy(_.union(keys1, keys2));
   allKeys.forEach((key) => {
     let state;
-    let value;
-    let diffValue;
+    let leftValue;
+    let rightValue;
     if (_.isPlainObject(obj1[key]) && _.isPlainObject(obj2[key])) {
       state = 'unchanged';
-      value = buildDiffObject(obj1[key], obj2[key]);
+      leftValue = buildDiffObject(obj1[key], obj2[key]);
     } else if (keys1.includes(key)) {
       if (keys2.includes(key)) {
         if (obj1[key] === obj2[key]) {
-          [state, value] = ['unchanged', obj1[key]];
+          [state, leftValue] = ['unchanged', obj1[key]];
         } else {
-          [state, value, diffValue] = ['changed', obj1[key], obj2[key]];
+          [state, leftValue, rightValue] = ['changed', obj1[key], obj2[key]];
         }
       } else {
-        [state, diffValue] = ['deleted', obj1[key]];
+        [state, rightValue] = ['deleted', obj1[key]];
       }
     } else {
-      [state, diffValue] = ['added', obj2[key]];
+      [state, rightValue] = ['added', obj2[key]];
     }
-    diffObject[key] = { state, value, diffValue };
+    diffObject[key] = { state, leftValue, rightValue };
   });
   return diffObject;
 };

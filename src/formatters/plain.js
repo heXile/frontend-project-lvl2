@@ -8,17 +8,18 @@ const formatPlain = (diffObject) => {
     keys.forEach((key) => {
       const currentProp = [...higherLevelProp, key];
       const propertyName = currentProp.join('.');
-      const { state, value, diffValue } = innerDiffObject[key];
-      const formattedValue = typeof value === 'string' ? `'${value}'` : value;
-      const formattedDiffValue =
-        typeof diffValue === 'string' ? `'${diffValue}'` : diffValue;
+      const { state, leftValue, rightValue } = innerDiffObject[key];
+      const formattedLeftValue =
+        typeof leftValue === 'string' ? `'${leftValue}'` : leftValue;
+      const formattedRightValue =
+        typeof rightValue === 'string' ? `'${rightValue}'` : rightValue;
       switch (state) {
         case 'added':
           result.push(
             `Property '${propertyName}' was added with value: ${
-              _.isPlainObject(formattedDiffValue)
+              _.isPlainObject(formattedRightValue)
                 ? '[complex value]'
-                : formattedDiffValue
+                : formattedRightValue
             }`
           );
           break;
@@ -28,19 +29,19 @@ const formatPlain = (diffObject) => {
         case 'changed':
           result.push(
             `Property '${propertyName}' was updated. From ${
-              _.isPlainObject(formattedValue)
+              _.isPlainObject(formattedLeftValue)
                 ? '[complex value]'
-                : formattedValue
+                : formattedLeftValue
             } to ${
-              _.isPlainObject(formattedDiffValue)
+              _.isPlainObject(formattedRightValue)
                 ? '[complex value]'
-                : formattedDiffValue
+                : formattedRightValue
             }`
           );
           break;
         case 'unchanged':
-          if (_.isPlainObject(formattedValue)) {
-            result.push(...iter(formattedValue, currentProp));
+          if (_.isPlainObject(formattedLeftValue)) {
+            result.push(...iter(formattedLeftValue, currentProp));
           }
           break;
         default:

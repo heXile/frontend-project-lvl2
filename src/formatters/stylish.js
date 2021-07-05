@@ -24,53 +24,53 @@ const formatStylish = (diffObject) => {
     const keys = _.sortBy(_.keys(innerDiffObject));
     const indent = getIndent(depth);
     keys.forEach((key) => {
-      const { state, value, diffValue } = innerDiffObject[key];
+      const { state, leftValue, rightValue } = innerDiffObject[key];
       switch (state) {
         case 'added':
-          if (_.isPlainObject(diffValue)) {
+          if (_.isPlainObject(rightValue)) {
             result.push(`${indent}  + ${key}: {`);
-            result.push(...formatPlainObject(diffValue, depth + 1));
+            result.push(...formatPlainObject(rightValue, depth + 1));
             result.push(`${indent}    }`);
           } else {
-            result.push(`${indent}  + ${key}: ${diffValue}`);
+            result.push(`${indent}  + ${key}: ${rightValue}`);
           }
           break;
         case 'deleted':
-          if (_.isPlainObject(diffValue)) {
+          if (_.isPlainObject(rightValue)) {
             result.push(`${indent}  - ${key}: {`);
-            result.push(...formatPlainObject(diffValue, depth + 1));
+            result.push(...formatPlainObject(rightValue, depth + 1));
             result.push(`${indent}    }`);
           } else {
-            result.push(`${indent}  - ${key}: ${diffValue}`);
+            result.push(`${indent}  - ${key}: ${rightValue}`);
           }
           break;
         case 'changed':
-          if (_.isPlainObject(value)) {
+          if (_.isPlainObject(leftValue)) {
             result.push(`${indent}  - ${key}: {`);
-            result.push(...formatPlainObject(value, depth + 1));
+            result.push(...formatPlainObject(leftValue, depth + 1));
             result.push(`${indent}    }`);
           } else {
-            result.push(`${indent}  - ${key}: ${value}`);
+            result.push(`${indent}  - ${key}: ${leftValue}`);
           }
-          if (_.isPlainObject(diffValue)) {
+          if (_.isPlainObject(rightValue)) {
             result.push(`${indent}  + ${key}: {`);
-            result.push(...formatPlainObject(diffValue, depth + 1));
+            result.push(...formatPlainObject(rightValue, depth + 1));
             result.push(`${indent}    }`);
           } else {
-            result.push(`${indent}  + ${key}: ${diffValue}`);
+            result.push(`${indent}  + ${key}: ${rightValue}`);
           }
           break;
         case 'unchanged':
-          if (_.isPlainObject(value)) {
+          if (_.isPlainObject(leftValue)) {
             result.push(`${indent}    ${key}: {`);
-            result.push(...iter(value, depth + 1));
+            result.push(...iter(leftValue, depth + 1));
             result.push(`${indent}    }`);
           } else {
-            result.push(`${indent}    ${key}: ${value}`);
+            result.push(`${indent}    ${key}: ${leftValue}`);
           }
           break;
         default:
-          result.push(`${indent}    ${key}: ${value}`);
+          result.push(`${indent}    ${key}: ${leftValue}`);
       }
     });
     return result;
