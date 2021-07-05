@@ -45,7 +45,7 @@ const formatPlain = (diffObject) => {
           }
           break;
         default:
-          console.log('Do nothing');
+          throw new Error(`Unknown node state: ${state}`);
       }
     });
     return result;

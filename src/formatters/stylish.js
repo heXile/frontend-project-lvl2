@@ -70,7 +70,7 @@ const formatStylish = (diffObject) => {
           }
           break;
         default:
-          result.push(`${indent}    ${key}: ${leftValue}`);
+          throw new Error(`Unknown node state: ${state}`);
       }
     });
     return result;
