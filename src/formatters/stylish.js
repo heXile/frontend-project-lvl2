@@ -18,13 +18,13 @@ const formatPlainObject = (obj, depth) => {
   return result;
 };
 
-const formatStylish = (diffObject) => {
-  const iter = (innerDiffObject, depth) => {
+const formatStylish = (diffTree) => {
+  const iter = (innerDiffTree, depth) => {
     const result = [];
-    const keys = _.sortBy(_.keys(innerDiffObject));
+    const keys = _.sortBy(_.keys(innerDiffTree));
     const indent = getIndent(depth);
     keys.forEach((key) => {
-      const { state, leftValue, rightValue } = innerDiffObject[key];
+      const { state, leftValue, rightValue } = innerDiffTree[key];
       switch (state) {
         case 'added':
           if (_.isPlainObject(rightValue)) {
@@ -75,7 +75,7 @@ const formatStylish = (diffObject) => {
     });
     return result;
   };
-  return ['{', ...iter(diffObject, 0), '}'].join('\n');
+  return ['{', ...iter(diffTree, 0), '}'].join('\n');
 };
 
 export default formatStylish;

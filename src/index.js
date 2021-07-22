@@ -1,63 +1,60 @@
-import _ from 'lodash';
+import _ from 'lodash'; // весь модуль надо разбить
 import * as path from 'path';
 import { readFileContent } from './utils.js';
 import chooseParser from './parsers.js';
 import chooseFormatter from './formatters/index.js';
 
 const fileFormats = {
-  '.json': 'JSON',
+  '.json': 'JSON', // переименовать или убрать
   '.yml': 'YAML',
   '.yaml': 'YAML',
 };
 
-const buildDiffObject = (obj1, obj2) => {
+const buildDiffTree = (objLeft, objRight) => {
+  // в отдельный модуль
   const diffObject = {};
-  const [keys1, keys2] = [_.keys(obj1), _.keys(obj2)];
+  const [keys1, keys2] = [_.keys(objLeft), _.keys(objRight)];
   const allKeys = _.sortBy(_.union(keys1, keys2));
   allKeys.forEach((key) => {
     let state;
     let leftValue;
     let rightValue;
-    if (_.isPlainObject(obj1[key]) && _.isPlainObject(obj2[key])) {
+    if (_.isPlainObject(objLeft[key]) && _.isPlainObject(objRight[key])) {
       state = 'unchanged';
-      leftValue = buildDiffObject(obj1[key], obj2[key]);
+      leftValue = buildDiffTree(objLeft[key], objRight[key]);
     } else if (keys1.includes(key)) {
       if (keys2.includes(key)) {
-        if (obj1[key] === obj2[key]) {
-          [state, leftValue] = ['unchanged', obj1[key]];
+        if (objLeft[key] === objRight[key]) {
+          [state, leftValue] = ['unchanged', objLeft[key]];
         } else {
-          [state, leftValue, rightValue] = ['changed', obj1[key], obj2[key]];
+          [state, leftValue, rightValue] = [
+            'changed',
+            objLeft[key],
+            objRight[key],
+          ];
         }
       } else {
-        [state, rightValue] = ['deleted', obj1[key]];
+        [state, rightValue] = ['deleted', objLeft[key]];
       }
     } else {
-      [state, rightValue] = ['added', obj2[key]];
+      [state, rightValue] = ['added', objRight[key]];
     }
     diffObject[key] = { state, leftValue, rightValue };
   });
   return diffObject;
 };
 
-const genDiff = (filePath1, filePath2, outputFormat = 'stylish') => {
-  const [ext1, ext2] = [path.extname(filePath1), path.extname(filePath2)];
-  if (fileFormats[ext1] !== fileFormats[ext2]) {
-    throw new Error('File formats must be the same');
-  }
+const genDiff = (filePathLeft, filePathRight, outputFormat = 'stylish') => {
+  const ext = path.extname(filePathLeft);
 
-  const [fileContent1, fileContent2] = [
-    readFileContent(filePath1),
-    readFileContent(filePath2),
+  const parseStr = chooseParser(fileFormats[ext]);
+
+  const [objLeft, objRight] = [
+    parseStr(readFileContent(filePathLeft)) || {},
+    parseStr(readFileContent(filePathRight)) || {},
   ];
 
-  const parseStr = chooseParser(fileFormats[ext1]);
-
-  const [obj1, obj2] = [
-    parseStr(fileContent1) || {},
-    parseStr(fileContent2) || {},
-  ];
-
-  const diffObject = buildDiffObject(obj1, obj2);
+  const diffObject = buildDiffTree(objLeft, objRight);
   const formatDiff = chooseFormatter(outputFormat);
   const diff = formatDiff(diffObject);
   return diff;

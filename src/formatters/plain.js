@@ -1,14 +1,14 @@
 import _ from 'lodash';
 
-const formatPlain = (diffObject) => {
-  const iter = (innerDiffObject, propNameAcc) => {
+const formatPlain = (diffTree) => {
+  const iter = (innerDiffTree, propNameAcc) => {
     const result = [];
     const higherLevelProp = propNameAcc.slice();
-    const keys = _.sortBy(_.keys(innerDiffObject));
+    const keys = _.sortBy(_.keys(innerDiffTree));
     keys.forEach((key) => {
       const currentProp = [...higherLevelProp, key];
       const propertyName = currentProp.join('.');
-      const { state, leftValue, rightValue } = innerDiffObject[key];
+      const { state, leftValue, rightValue } = innerDiffTree[key];
       const formattedLeftValue =
         typeof leftValue === 'string' ? `'${leftValue}'` : leftValue;
       const formattedRightValue =
@@ -50,7 +50,7 @@ const formatPlain = (diffObject) => {
     });
     return result;
   };
-  return [...iter(diffObject, [])].join('\n');
+  return [...iter(diffTree, [])].join('\n');
 };
 
 export default formatPlain;
