@@ -2,80 +2,50 @@ import _ from 'lodash';
 
 const getIndent = (depth) => '    '.repeat(depth);
 
-const formatPlainObject = (obj, depth) => {
-  const result = [];
-  const indent = getIndent(depth + 1);
-  const keys = _.sortBy(_.keys(obj));
-  keys.forEach((key) => {
-    if (!_.isPlainObject(obj[key])) {
-      result.push(`${indent}${key}: ${obj[key]}`);
-    } else {
-      result.push(`${indent}${key}: {`);
-      result.push(...formatPlainObject(obj[key], depth + 1));
-      result.push(`${indent}}`);
+const formatValue = (value, depth) => {
+  if (!_.isPlainObject(value)) {
+    return value;
+  }
+  const contentIndent = getIndent(depth + 1);
+  const bracketIndent = getIndent(depth);
+  const keys = _.sortBy(_.keys(value));
+  const lines = keys.map((key) => {
+    if (!_.isPlainObject(value[key])) {
+      return `${contentIndent}${key}: ${value[key]}`;
     }
+    return `${contentIndent}${key}: ${formatValue(value[key], depth + 1)}`;
   });
-  return result;
+  return ['{', ...lines, `${bracketIndent}}`].join('\n');
 };
 
 const formatStylish = (diffTree) => {
   const iter = (innerDiffTree, depth) => {
-    const result = [];
     const keys = _.sortBy(_.keys(innerDiffTree));
     const indent = getIndent(depth);
-    keys.forEach((key) => {
+    const lines = keys.map((key) => {
       const { state, leftValue, rightValue } = innerDiffTree[key];
       switch (state) {
         case 'added':
-          if (_.isPlainObject(rightValue)) {
-            result.push(`${indent}  + ${key}: {`);
-            result.push(...formatPlainObject(rightValue, depth + 1));
-            result.push(`${indent}    }`);
-          } else {
-            result.push(`${indent}  + ${key}: ${rightValue}`);
-          }
-          break;
+          return `${indent}  + ${key}: ${formatValue(rightValue, depth + 1)}`;
         case 'deleted':
-          if (_.isPlainObject(rightValue)) {
-            result.push(`${indent}  - ${key}: {`);
-            result.push(...formatPlainObject(rightValue, depth + 1));
-            result.push(`${indent}    }`);
-          } else {
-            result.push(`${indent}  - ${key}: ${rightValue}`);
-          }
-          break;
+          return `${indent}  - ${key}: ${formatValue(rightValue, depth + 1)}`;
         case 'changed':
-          if (_.isPlainObject(leftValue)) {
-            result.push(`${indent}  - ${key}: {`);
-            result.push(...formatPlainObject(leftValue, depth + 1));
-            result.push(`${indent}    }`);
-          } else {
-            result.push(`${indent}  - ${key}: ${leftValue}`);
-          }
-          if (_.isPlainObject(rightValue)) {
-            result.push(`${indent}  + ${key}: {`);
-            result.push(...formatPlainObject(rightValue, depth + 1));
-            result.push(`${indent}    }`);
-          } else {
-            result.push(`${indent}  + ${key}: ${rightValue}`);
-          }
-          break;
+          return [
+            `${indent}  - ${key}: ${formatValue(leftValue, depth + 1)}`,
+            `${indent}  + ${key}: ${formatValue(rightValue, depth + 1)}`,
+          ].join('\n');
         case 'unchanged':
           if (_.isPlainObject(leftValue)) {
-            result.push(`${indent}    ${key}: {`);
-            result.push(...iter(leftValue, depth + 1));
-            result.push(`${indent}    }`);
-          } else {
-            result.push(`${indent}    ${key}: ${leftValue}`);
+            return `${indent}    ${key}: ${iter(leftValue, depth + 1)}`;
           }
-          break;
+          return `${indent}    ${key}: ${leftValue}`;
         default:
           throw new Error(`Unknown node state: ${state}`);
       }
     });
-    return result;
+    return ['{', ...lines, `${indent}}`].join('\n');
   };
-  return ['{', ...iter(diffTree, 0), '}'].join('\n');
+  return iter(diffTree, 0);
 };
 
 export default formatStylish;

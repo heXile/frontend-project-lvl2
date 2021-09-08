@@ -1,11 +1,15 @@
 import _ from 'lodash';
 
+const isEmpty = (value) => value !== undefined;
+
 const formatPlain = (diffTree) => {
   const iter = (innerDiffTree, propNameAcc) => {
-    const result = [];
+    if (!_.isPlainObject(innerDiffTree)) {
+      return;
+    }
     const higherLevelProp = propNameAcc.slice();
     const keys = _.sortBy(_.keys(innerDiffTree));
-    keys.forEach((key) => {
+    const lines = keys.map((key) => {
       const currentProp = [...higherLevelProp, key];
       const propertyName = currentProp.join('.');
       const { state, leftValue, rightValue } = innerDiffTree[key];
@@ -15,42 +19,33 @@ const formatPlain = (diffTree) => {
         typeof rightValue === 'string' ? `'${rightValue}'` : rightValue;
       switch (state) {
         case 'added':
-          result.push(
-            `Property '${propertyName}' was added with value: ${
-              _.isPlainObject(formattedRightValue)
-                ? '[complex value]'
-                : formattedRightValue
-            }`
-          );
-          break;
+          return `Property '${propertyName}' was added with value: ${
+            _.isPlainObject(formattedRightValue)
+              ? '[complex value]'
+              : formattedRightValue
+          }`;
         case 'deleted':
-          result.push(`Property '${propertyName}' was removed`);
-          break;
+          return `Property '${propertyName}' was removed`;
         case 'changed':
-          result.push(
-            `Property '${propertyName}' was updated. From ${
-              _.isPlainObject(formattedLeftValue)
-                ? '[complex value]'
-                : formattedLeftValue
-            } to ${
-              _.isPlainObject(formattedRightValue)
-                ? '[complex value]'
-                : formattedRightValue
-            }`
-          );
-          break;
+          return `Property '${propertyName}' was updated. From ${
+            _.isPlainObject(formattedLeftValue)
+              ? '[complex value]'
+              : formattedLeftValue
+          } to ${
+            _.isPlainObject(formattedRightValue)
+              ? '[complex value]'
+              : formattedRightValue
+          }`;
         case 'unchanged':
-          if (_.isPlainObject(formattedLeftValue)) {
-            result.push(...iter(formattedLeftValue, currentProp));
-          }
-          break;
+          return iter(formattedLeftValue, currentProp);
         default:
           throw new Error(`Unknown node state: ${state}`);
       }
     });
-    return result;
+    // eslint-disable-next-line consistent-return
+    return lines.filter(isEmpty).join('\n');
   };
-  return [...iter(diffTree, [])].join('\n');
+  return iter(diffTree, []);
 };
 
 export default formatPlain;
