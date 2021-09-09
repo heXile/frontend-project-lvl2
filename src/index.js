@@ -4,16 +4,10 @@ import chooseParser from './parsers.js';
 import buildDiff from './buildDiff.js';
 import chooseFormatter from './formatters/index.js';
 
-const fileFormats = {
-  '.json': 'JSON', // переименовать или убрать
-  '.yml': 'YAML',
-  '.yaml': 'YAML',
-};
-
 const genDiff = (filePathLeft, filePathRight, outputFormat = 'stylish') => {
   const ext = path.extname(filePathLeft);
 
-  const parseStr = chooseParser(fileFormats[ext]);
+  const parseStr = chooseParser(ext);
 
   const [objLeft, objRight] = [
     parseStr(readFileContent(filePathLeft)) || {},
