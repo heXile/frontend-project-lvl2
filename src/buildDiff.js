@@ -21,7 +21,9 @@ const buildDiff = (objLeft, objRight) => {
       return { key, state: 'unchanged', oldValue };
     }
     const [oldValue, newValue] = [objLeft[key], objRight[key]];
-    return { key, state: 'changed', oldValue, newValue };
+    return {
+      key, state: 'changed', oldValue, newValue,
+    };
   });
   return diff;
 };

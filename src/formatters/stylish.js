@@ -22,7 +22,9 @@ const formatStylish = (diff) => {
   const iter = (innerDiff, depth) => {
     const indent = getIndent(depth);
     const lines = innerDiff.map((entry) => {
-      const { key, state, oldValue, newValue, children } = entry;
+      const {
+        key, state, oldValue, newValue, children,
+      } = entry;
       switch (state) {
         case 'added':
           return `${indent}  + ${key}: ${formatValue(newValue, depth + 1)}`;

@@ -16,19 +16,21 @@ const formatPlain = (diff) => {
   const iter = (innerDiff, propNameAcc) => {
     const higherLevelProp = propNameAcc.slice();
     const lines = innerDiff.map((entry) => {
-      const { key, state, oldValue, newValue, children } = entry;
+      const {
+        key, state, oldValue, newValue, children, 
+      } = entry;
       const currentProp = [...higherLevelProp, key];
       const propertyName = currentProp.join('.');
       switch (state) {
         case 'added':
           return `Property '${propertyName}' was added with value: ${formatValue(
-            newValue
+            newValue,
           )}`;
         case 'deleted':
           return `Property '${propertyName}' was removed`;
         case 'changed':
           return `Property '${propertyName}' was updated. From ${formatValue(
-            oldValue
+            oldValue,
           )} to ${formatValue(newValue)}`;
         case 'nested':
           return iter(children, currentProp);

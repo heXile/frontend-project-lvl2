@@ -8,7 +8,7 @@ program
   .option(
     '-f --format [type]',
     'Output format: stylish | plain | json',
-    'stylish'
+    'stylish',
   )
   .arguments('<filepath1> <filepath2>');
 

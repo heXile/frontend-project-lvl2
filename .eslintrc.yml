@@ -25,3 +25,6 @@ rules:
   fp/no-throw: 0
   fp/no-nil: 0
   fp/no-unused-expression: 0
+  comma-dangle: ['error', 'always-multiline']
+  implicit-arrow-linebreak: ['error', 'beside']
+  object-curly-newline: ['error', { 'minProperties': 4 }]
