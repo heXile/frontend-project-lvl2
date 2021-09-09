@@ -18,34 +18,32 @@ const formatValue = (value, depth) => {
   return ['{', ...lines, `${bracketIndent}}`].join('\n');
 };
 
-const formatStylish = (diffTree) => {
-  const iter = (innerDiffTree, depth) => {
-    const keys = _.sortBy(_.keys(innerDiffTree));
+const formatStylish = (diff) => {
+  const iter = (innerDiff, depth) => {
     const indent = getIndent(depth);
-    const lines = keys.map((key) => {
-      const { state, leftValue, rightValue } = innerDiffTree[key];
+    const lines = innerDiff.map((entry) => {
+      const { key, state, oldValue, newValue, children } = entry;
       switch (state) {
         case 'added':
-          return `${indent}  + ${key}: ${formatValue(rightValue, depth + 1)}`;
+          return `${indent}  + ${key}: ${formatValue(newValue, depth + 1)}`;
         case 'deleted':
-          return `${indent}  - ${key}: ${formatValue(rightValue, depth + 1)}`;
+          return `${indent}  - ${key}: ${formatValue(oldValue, depth + 1)}`;
         case 'changed':
           return [
-            `${indent}  - ${key}: ${formatValue(leftValue, depth + 1)}`,
-            `${indent}  + ${key}: ${formatValue(rightValue, depth + 1)}`,
+            `${indent}  - ${key}: ${formatValue(oldValue, depth + 1)}`,
+            `${indent}  + ${key}: ${formatValue(newValue, depth + 1)}`,
           ].join('\n');
         case 'unchanged':
-          if (_.isPlainObject(leftValue)) {
-            return `${indent}    ${key}: ${iter(leftValue, depth + 1)}`;
-          }
-          return `${indent}    ${key}: ${leftValue}`;
+          return `${indent}    ${key}: ${formatValue(oldValue, depth + 1)}`;
+        case 'nested':
+          return `${indent}    ${key}: ${iter(children, depth + 1)}`;
         default:
           throw new Error(`Unknown node state: ${state}`);
       }
     });
     return ['{', ...lines, `${indent}}`].join('\n');
   };
-  return iter(diffTree, 0);
+  return iter(diff, 0);
 };
 
 export default formatStylish;

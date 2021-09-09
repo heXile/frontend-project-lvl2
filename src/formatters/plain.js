@@ -2,50 +2,45 @@ import _ from 'lodash';
 
 const isEmpty = (value) => value !== undefined;
 
-const formatPlain = (diffTree) => {
-  const iter = (innerDiffTree, propNameAcc) => {
-    if (!_.isPlainObject(innerDiffTree)) {
-      return;
-    }
+const formatValue = (value) => {
+  if (typeof value === 'string') {
+    return `'${value}'`;
+  }
+  if (_.isPlainObject(value)) {
+    return '[complex value]';
+  }
+  return value;
+};
+
+const formatPlain = (diff) => {
+  const iter = (innerDiff, propNameAcc) => {
     const higherLevelProp = propNameAcc.slice();
-    const keys = _.sortBy(_.keys(innerDiffTree));
-    const lines = keys.map((key) => {
+    const lines = innerDiff.map((entry) => {
+      const { key, state, oldValue, newValue, children } = entry;
       const currentProp = [...higherLevelProp, key];
       const propertyName = currentProp.join('.');
-      const { state, leftValue, rightValue } = innerDiffTree[key];
-      const formattedLeftValue =
-        typeof leftValue === 'string' ? `'${leftValue}'` : leftValue;
-      const formattedRightValue =
-        typeof rightValue === 'string' ? `'${rightValue}'` : rightValue;
       switch (state) {
         case 'added':
-          return `Property '${propertyName}' was added with value: ${
-            _.isPlainObject(formattedRightValue)
-              ? '[complex value]'
-              : formattedRightValue
-          }`;
+          return `Property '${propertyName}' was added with value: ${formatValue(
+            newValue
+          )}`;
         case 'deleted':
           return `Property '${propertyName}' was removed`;
         case 'changed':
-          return `Property '${propertyName}' was updated. From ${
-            _.isPlainObject(formattedLeftValue)
-              ? '[complex value]'
-              : formattedLeftValue
-          } to ${
-            _.isPlainObject(formattedRightValue)
-              ? '[complex value]'
-              : formattedRightValue
-          }`;
+          return `Property '${propertyName}' was updated. From ${formatValue(
+            oldValue
+          )} to ${formatValue(newValue)}`;
+        case 'nested':
+          return iter(children, currentProp);
         case 'unchanged':
-          return iter(formattedLeftValue, currentProp);
+          return undefined;
         default:
           throw new Error(`Unknown node state: ${state}`);
       }
     });
-    // eslint-disable-next-line consistent-return
     return lines.filter(isEmpty).join('\n');
   };
-  return iter(diffTree, []);
+  return iter(diff, []);
 };
 
 export default formatPlain;

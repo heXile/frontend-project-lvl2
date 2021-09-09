@@ -1,36 +1,29 @@
 import _ from 'lodash';
 
 const buildDiff = (objLeft, objRight) => {
-  const diffTree = {};
-  const [keys1, keys2] = [_.keys(objLeft), _.keys(objRight)];
-  const allKeys = _.sortBy(_.union(keys1, keys2));
-  allKeys.forEach((key) => {
-    let state;
-    let leftValue;
-    let rightValue;
+  const [keysLeft, keysRight] = [_.keys(objLeft), _.keys(objRight)];
+  const allKeys = _.sortBy(_.union(keysLeft, keysRight));
+  const diff = allKeys.map((key) => {
     if (_.isPlainObject(objLeft[key]) && _.isPlainObject(objRight[key])) {
-      state = 'unchanged';
-      leftValue = buildDiff(objLeft[key], objRight[key]);
-    } else if (keys1.includes(key)) {
-      if (keys2.includes(key)) {
-        if (objLeft[key] === objRight[key]) {
-          [state, leftValue] = ['unchanged', objLeft[key]];
-        } else {
-          [state, leftValue, rightValue] = [
-            'changed',
-            objLeft[key],
-            objRight[key],
-          ];
-        }
-      } else {
-        [state, rightValue] = ['deleted', objLeft[key]];
-      }
-    } else {
-      [state, rightValue] = ['added', objRight[key]];
+      const children = buildDiff(objLeft[key], objRight[key]);
+      return { key, state: 'nested', children };
     }
-    diffTree[key] = { state, leftValue, rightValue };
+    if (!keysLeft.includes(key)) {
+      const newValue = objRight[key];
+      return { key, state: 'added', newValue };
+    }
+    if (!keysRight.includes(key)) {
+      const oldValue = objLeft[key];
+      return { key, state: 'deleted', oldValue };
+    }
+    if (objLeft[key] === objRight[key]) {
+      const oldValue = objLeft[key];
+      return { key, state: 'unchanged', oldValue };
+    }
+    const [oldValue, newValue] = [objLeft[key], objRight[key]];
+    return { key, state: 'changed', oldValue, newValue };
   });
-  return diffTree;
+  return diff;
 };
 
 export default buildDiff;
