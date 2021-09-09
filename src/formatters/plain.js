@@ -17,7 +17,7 @@ const formatPlain = (diff) => {
     const higherLevelProp = propNameAcc.slice();
     const lines = innerDiff.map((entry) => {
       const {
-        key, state, oldValue, newValue, children, 
+        key, state, oldValue, newValue, children,
       } = entry;
       const currentProp = [...higherLevelProp, key];
       const propertyName = currentProp.join('.');

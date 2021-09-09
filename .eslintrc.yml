@@ -28,3 +28,4 @@ rules:
   comma-dangle: ['error', 'always-multiline']
   implicit-arrow-linebreak: ['error', 'beside']
   object-curly-newline: ['error', { 'minProperties': 4 }]
+  no-trailing-spaces: ['error']
