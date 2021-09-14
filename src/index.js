@@ -5,9 +5,7 @@ import buildDiff from './buildDiff.js';
 import chooseFormatter from './formatters/index.js';
 
 const genDiff = (filePathLeft, filePathRight, outputFormat = 'stylish') => {
-  const ext = path.extname(filePathLeft);
-
-  const parseStr = chooseParser(ext);
+  const parseStr = chooseParser(path.extname(filePathLeft).slice(1));
 
   const [objLeft, objRight] = [
     parseStr(readFileContent(filePathLeft)) || {},

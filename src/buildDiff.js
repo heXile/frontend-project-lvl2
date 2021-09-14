@@ -1,26 +1,26 @@
 import _ from 'lodash';
 
-const buildDiff = (objLeft, objRight) => {
-  const [keysLeft, keysRight] = [_.keys(objLeft), _.keys(objRight)];
+const buildDiff = (dataLeft, dataRight) => {
+  const [keysLeft, keysRight] = [_.keys(dataLeft), _.keys(dataRight)];
   const allKeys = _.sortBy(_.union(keysLeft, keysRight));
   const diff = allKeys.map((key) => {
-    if (_.isPlainObject(objLeft[key]) && _.isPlainObject(objRight[key])) {
-      const children = buildDiff(objLeft[key], objRight[key]);
+    if (_.isPlainObject(dataLeft[key]) && _.isPlainObject(dataRight[key])) {
+      const children = buildDiff(dataLeft[key], dataRight[key]);
       return { key, state: 'nested', children };
     }
     if (!keysLeft.includes(key)) {
-      const newValue = objRight[key];
+      const newValue = dataRight[key];
       return { key, state: 'added', newValue };
     }
     if (!keysRight.includes(key)) {
-      const oldValue = objLeft[key];
+      const oldValue = dataLeft[key];
       return { key, state: 'deleted', oldValue };
     }
-    if (objLeft[key] === objRight[key]) {
-      const oldValue = objLeft[key];
+    if (dataLeft[key] === dataRight[key]) {
+      const oldValue = dataLeft[key];
       return { key, state: 'unchanged', oldValue };
     }
-    const [oldValue, newValue] = [objLeft[key], objRight[key]];
+    const [oldValue, newValue] = [dataLeft[key], dataRight[key]];
     return {
       key, state: 'changed', oldValue, newValue,
     };
