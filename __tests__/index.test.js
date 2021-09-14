@@ -6,32 +6,53 @@ import { readFileContent } from '../src/utils.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const getFixturePath = (filename) => path.join(__dirname, '..', '__fixtures__', filename);
+const getFixturePath = (filename) =>
+  path.join(__dirname, '..', '__fixtures__', filename);
 
 test('gendiff main json functionality', () => {
   expect(
     genDiff(
-      getFixturePath('file1.json'),
-      getFixturePath('file2.json'),
-      'stylish',
-    ),
-  ).toEqual(readFileContent(getFixturePath('result1to2.stylish')));
+      getFixturePath('fileLeft.json'),
+      getFixturePath('fileRight.json'),
+      'stylish'
+    )
+  ).toEqual(readFileContent(getFixturePath('result-stylish.txt')));
   expect(
-    genDiff(getFixturePath('file1.json'), getFixturePath('file2.json'), 'plain'),
-  ).toEqual(readFileContent(getFixturePath('result1to2.plain')));
+    genDiff(
+      getFixturePath('fileLeft.json'),
+      getFixturePath('fileRight.json'),
+      'plain'
+    )
+  ).toEqual(readFileContent(getFixturePath('result-plain.txt')));
   expect(
-    genDiff(getFixturePath('file1.json'), getFixturePath('file2.json'), 'json'),
-  ).toEqual(readFileContent(getFixturePath('result1to2.json')));
+    genDiff(
+      getFixturePath('fileLeft.json'),
+      getFixturePath('fileRight.json'),
+      'json'
+    )
+  ).toEqual(readFileContent(getFixturePath('result.json')));
 });
 
 test('gendiff main yaml functionality', () => {
   expect(
-    genDiff(getFixturePath('file1.yml'), getFixturePath('file2.yml'), 'stylish'),
-  ).toEqual(readFileContent(getFixturePath('result1to2.stylish')));
+    genDiff(
+      getFixturePath('fileLeft.yml'),
+      getFixturePath('fileRight.yml'),
+      'stylish'
+    )
+  ).toEqual(readFileContent(getFixturePath('result-stylish.txt')));
   expect(
-    genDiff(getFixturePath('file1.yml'), getFixturePath('file2.yml'), 'plain'),
-  ).toEqual(readFileContent(getFixturePath('result1to2.plain')));
+    genDiff(
+      getFixturePath('fileLeft.yml'),
+      getFixturePath('fileRight.yml'),
+      'plain'
+    )
+  ).toEqual(readFileContent(getFixturePath('result-plain.txt')));
   expect(
-    genDiff(getFixturePath('file1.yml'), getFixturePath('file2.yml'), 'json'),
-  ).toEqual(readFileContent(getFixturePath('result1to2.json')));
+    genDiff(
+      getFixturePath('fileLeft.yml'),
+      getFixturePath('fileRight.yml'),
+      'json'
+    )
+  ).toEqual(readFileContent(getFixturePath('result.json')));
 });
