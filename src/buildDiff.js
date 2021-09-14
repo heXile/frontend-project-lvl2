@@ -2,8 +2,7 @@ import _ from 'lodash';
 
 const buildDiff = (dataLeft, dataRight) => {
   const [keysLeft, keysRight] = [_.keys(dataLeft), _.keys(dataRight)];
-  const allKeys = _.sortBy(_.union(keysLeft, keysRight));
-  const diff = allKeys.map((key) => {
+  const diff = _.sortBy(_.union(keysLeft, keysRight)).map((key) => {
     if (_.isPlainObject(dataLeft[key]) && _.isPlainObject(dataRight[key])) {
       const children = buildDiff(dataLeft[key], dataRight[key]);
       return { key, state: 'nested', children };
