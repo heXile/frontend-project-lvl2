@@ -12,7 +12,6 @@ extends:
   - 'airbnb-base'
   - 'plugin:jest/recommended'
   - 'plugin:fp/recommended'
-  - 'prettier'
 
 parserOptions:
   ecmaVersion: 11
