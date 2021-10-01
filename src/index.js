@@ -7,15 +7,14 @@ import chooseFormatter from './formatters/index.js';
 const genDiff = (filePathLeft, filePathRight, outputFormat = 'stylish') => {
   const parseStr = chooseParser(path.extname(filePathLeft).slice(1));
 
-  const [objLeft, objRight] = [
+  const [dataLeft, dataRight] = [
     parseStr(readFileContent(filePathLeft)) || {},
     parseStr(readFileContent(filePathRight)) || {},
   ];
 
-  const diffTree = buildDiff(objLeft, objRight);
+  const diffTree = buildDiff(dataLeft, dataRight);
   const formatDiff = chooseFormatter(outputFormat);
-  const diff = formatDiff(diffTree);
-  return diff;
+  return formatDiff(diffTree);
 };
 
 export default genDiff;
