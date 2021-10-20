@@ -13,8 +13,8 @@ const genDiff = (filePathLeft, filePathRight, outputFormat = 'stylish') => {
   ];
 
   const diffTree = buildDiff(dataLeft, dataRight);
-  const format = chooseFormatter(outputFormat);
-  return format(diffTree);
+  const formatter = chooseFormatter(outputFormat);
+  return formatter(diffTree);
 };
 
 export default genDiff;
