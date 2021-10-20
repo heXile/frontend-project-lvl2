@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-const keysJoin = (key, name) => {
+const joinKeys = (key, name) => {
   if (!name) return '';
   if (key === '') return `${name}`;
   return `${key}.${name}`;
@@ -21,7 +21,7 @@ const plain = (diff) => {
     const {
       key, state, oldValue, newValue, children,
     } = node;
-    const newKey = keysJoin(name, key);
+    const newKey = joinKeys(name, key);
     const lines = children && children.flatMap((child) => iter(child, newKey));
     switch (state) {
       case 'root':
