@@ -1,30 +1,26 @@
 import _ from 'lodash';
 
 const buildDiff = (dataLeft, dataRight) => {
-  const [keysLeft, keysRight] = [_.keys(dataLeft), _.keys(dataRight)];
+  const keysLeft = _.keys(dataLeft);
+  const keysRight = _.keys(dataRight);
   const diff = _.sortBy(_.union(keysLeft, keysRight)).map((key) => {
     if (_.isPlainObject(dataLeft[key]) && _.isPlainObject(dataRight[key])) {
-      const children = buildDiff(dataLeft[key], dataRight[key]);
-      return { key, state: 'nested', children };
+      return { key, state: 'nested', children: buildDiff(dataLeft[key], dataRight[key]) };
     }
     if (!keysLeft.includes(key)) {
-      const newValue = dataRight[key];
-      return { key, state: 'added', newValue };
+      return { key, state: 'added', newValue: dataRight[key] };
     }
     if (!keysRight.includes(key)) {
-      const oldValue = dataLeft[key];
-      return { key, state: 'deleted', oldValue };
+      return { key, state: 'deleted', oldValue: dataLeft[key] };
     }
     if (dataLeft[key] === dataRight[key]) {
-      const oldValue = dataLeft[key];
-      return { key, state: 'unchanged', oldValue };
+      return { key, state: 'unchanged', oldValue: dataLeft[key] };
     }
-    const [oldValue, newValue] = [dataLeft[key], dataRight[key]];
     return {
-      key, state: 'changed', oldValue, newValue,
+      key, state: 'changed', oldValue: dataLeft[key], newValue: dataRight[key],
     };
   });
   return diff;
 };
 
-export default buildDiff;
+export default (dataLeft, dataRight) => ({ state: 'root', children: buildDiff(dataLeft, dataRight) });

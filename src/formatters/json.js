@@ -1,3 +1,3 @@
-const formatJSON = (diffTree) => JSON.stringify(diffTree, null, '  ');
+const formatJSON = (diffTree) => JSON.stringify(diffTree.children, null, '  ');
 
 export default formatJSON;

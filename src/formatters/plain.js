@@ -1,6 +1,10 @@
 import _ from 'lodash';
 
-const isEmpty = (value) => value !== undefined;
+const keysJoin = (key, name) => {
+  if (!name) return '';
+  if (key === '') return `${name}`;
+  return `${key}.${name}`;
+};
 
 const formatValue = (value) => {
   if (typeof value === 'string') {
@@ -12,37 +16,35 @@ const formatValue = (value) => {
   return value;
 };
 
-const formatPlain = (diff) => {
-  const iter = (innerDiff, propNameAcc) => {
-    const higherLevelProp = propNameAcc.slice();
-    const lines = innerDiff.map((entry) => {
-      const {
-        key, state, oldValue, newValue, children,
-      } = entry;
-      const currentProp = [...higherLevelProp, key];
-      const propertyName = currentProp.join('.');
-      switch (state) {
-        case 'added':
-          return `Property '${propertyName}' was added with value: ${formatValue(
-            newValue,
-          )}`;
-        case 'deleted':
-          return `Property '${propertyName}' was removed`;
-        case 'changed':
-          return `Property '${propertyName}' was updated. From ${formatValue(
-            oldValue,
-          )} to ${formatValue(newValue)}`;
-        case 'nested':
-          return iter(children, currentProp);
-        case 'unchanged':
-          return undefined;
-        default:
-          throw new Error(`Unknown node state: ${state}`);
-      }
-    });
-    return lines.filter(isEmpty).join('\n');
+const plain = (diff) => {
+  const iter = (node, name) => {
+    const {
+      key, state, oldValue, newValue, children,
+    } = node;
+    const newKey = keysJoin(name, key);
+    const lines = children && children.flatMap((child) => iter(child, newKey));
+    switch (state) {
+      case 'root':
+        return lines;
+      case 'added':
+        return `Property '${newKey}' was added with value: ${formatValue(
+          newValue,
+        )}`;
+      case 'deleted':
+        return `Property '${newKey}' was removed`;
+      case 'changed':
+        return `Property '${newKey}' was updated. From ${formatValue(
+          oldValue,
+        )} to ${formatValue(newValue)}`;
+      case 'nested':
+        return lines;
+      case 'unchanged':
+        return null;
+      default:
+        throw new Error(`Unknown node state: ${state}`);
+    }
   };
-  return iter(diff, []);
+  return iter(diff, '').filter((el) => !_.isNull(el)).join('\n');
 };
 
-export default formatPlain;
+export default plain;

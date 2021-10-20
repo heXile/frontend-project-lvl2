@@ -1,51 +1,46 @@
 import _ from 'lodash';
 
-const getIndent = (depth) => '    '.repeat(depth);
+const getIndent = (depth, spaceCount = 4) => _.repeat(' ', depth * spaceCount - 2);
 
 const formatValue = (value, depth) => {
   if (!_.isPlainObject(value)) {
-    return value;
+    return `${value}`;
   }
   const contentIndent = getIndent(depth + 1);
   const bracketIndent = getIndent(depth);
   const keys = _.sortBy(_.keys(value));
-  const lines = keys.map((key) => {
-    if (!_.isPlainObject(value[key])) {
-      return `${contentIndent}${key}: ${value[key]}`;
-    }
-    return `${contentIndent}${key}: ${formatValue(value[key], depth + 1)}`;
-  });
-  return ['{', ...lines, `${bracketIndent}}`].join('\n');
+  const lines = keys.map((key) => `${contentIndent}  ${key}: ${formatValue(value[key], depth + 1)}`);
+  return ['{', ...lines, `${bracketIndent}  }`].join('\n');
 };
 
-const formatStylish = (diff) => {
-  const iter = (innerDiff, depth) => {
+const stylish = (diff) => {
+  const iter = (node, depth) => {
     const indent = getIndent(depth);
-    const lines = innerDiff.map((entry) => {
-      const {
-        key, state, oldValue, newValue, children,
-      } = entry;
-      switch (state) {
-        case 'added':
-          return `${indent}  + ${key}: ${formatValue(newValue, depth + 1)}`;
-        case 'deleted':
-          return `${indent}  - ${key}: ${formatValue(oldValue, depth + 1)}`;
-        case 'changed':
-          return [
-            `${indent}  - ${key}: ${formatValue(oldValue, depth + 1)}`,
-            `${indent}  + ${key}: ${formatValue(newValue, depth + 1)}`,
-          ].join('\n');
-        case 'unchanged':
-          return `${indent}    ${key}: ${formatValue(oldValue, depth + 1)}`;
-        case 'nested':
-          return `${indent}    ${key}: ${iter(children, depth + 1)}`;
-        default:
-          throw new Error(`Unknown node state: ${state}`);
-      }
-    });
-    return ['{', ...lines, `${indent}}`].join('\n');
+    const {
+      key, state, oldValue, newValue, children,
+    } = node;
+    const lines = children && children.flatMap((child) => iter(child, depth + 1));
+    switch (state) {
+      case 'root':
+        return `{\n${lines.join('\n')}\n}`;
+      case 'added':
+        return `${indent}+ ${key}: ${formatValue(newValue, depth)}`;
+      case 'deleted':
+        return `${indent}- ${key}: ${formatValue(oldValue, depth)}`;
+      case 'changed':
+        return [
+          `${indent}- ${key}: ${formatValue(oldValue, depth)}`,
+          `${indent}+ ${key}: ${formatValue(newValue, depth)}`,
+        ].join('\n');
+      case 'unchanged':
+        return `${indent}  ${key}: ${formatValue(oldValue, depth)}`;
+      case 'nested':
+        return `${indent}  ${key}: {\n${lines.join('\n')}\n${indent}  }`;
+      default:
+        throw new Error(`Unknown node state: ${state}`);
+    }
   };
   return iter(diff, 0);
 };
 
-export default formatStylish;
+export default stylish;
